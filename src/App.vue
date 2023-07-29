@@ -1,31 +1,44 @@
 <script setup>
-import HelloWorld from './components/HelloWorld.vue'
+import { computed, ref } from 'vue'
+
+let id = 0
+const todos = ref([
+  { id: id, text: 'makanai', done: false },
+  { id: id++, text: 'jumpei', done: false },
+  { id: id++, text: 'mark', done: true },
+])
+
+const HideIsfalse = ref(true)
+const filteredTodo = computed(() => (HideIsfalse.value ? todos.value : todos.value.filter((t) => !t.done)))
+
+const todoText = ref('')
+function addTodo() {
+  todos.value.push({ id: id++, text: todoText.value, done: false })
+  todoText.value = ''
+}
+
+function removeTodo(e) {
+  todos.value = todos.value.filter((t) => t !== e)
+}
 </script>
 
 <template>
-  <div>
-    <p>aa</p>
-    <a href="https://vitejs.dev" target="_blank">
-      <img src="/vite.svg" class="logo" alt="Vite logo" />
-    </a>
-    <a href="https://vuejs.org/" target="_blank">
-      <img src="./assets/vue.svg" class="logo vue" alt="Vue logo" />
-    </a>
-  </div>
-  <HelloWorld msg="Vite + Vue" />
+  <form @submit.prevent="addTodo">
+    <input v-model="todoText" />
+    <button>Add todo</button>
+  </form>
+  <ul>
+    <li v-for="todo in filteredTodo" :key="todo.id">
+      <input type="checkbox" v-model="todo.done" />
+      <span :class="{ done: todo.done }">{{ todo.text }}</span>
+      <button @click="removeTodo(todo)">X</button>
+    </li>
+  </ul>
+  <button @click="HideIsfalse = !HideIsfalse">{{ HideIsfalse ? 'visible中' : 'hide中' }}</button>
 </template>
 
 <style scoped>
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.vue:hover {
-  filter: drop-shadow(0 0 2em #42b883aa);
+.done {
+  text-decoration: line-through;
 }
 </style>
